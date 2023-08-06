@@ -1,0 +1,611 @@
+import axios from 'axios';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { Route, Routes } from 'react-router-dom';
+import '../node_modules/bootstrap/dist/js/bootstrap.min.js';
+import { setUserData } from './actions/userAction.js';
+import './index.css';
+import Addbases from './Screens/Addbases.js';
+import Addpizza from './Screens/Addpizza.js';
+import Addtopping from './Screens/Addtopping.js';
+import AdminScreen from './Screens/AdminScreen/AdminScreen';
+import Baseslist from './Screens/Baseslist.js';
+import CartScreen from './Screens/CartScreen/CartScreen';
+import Editbase from './Screens/Editbase.js';
+import Editpizza from './Screens/Editpizza';
+import Edittopping from './Screens/Edittopping.js';
+import EmailVerify from './Screens/EmailVerify';
+import ForgotPassword from './Screens/ForgotPassword';
+import Home from './Screens/Home';
+import Login from './Screens/Login';
+import Main from './Screens/Main';
+import MyoPizza from './Screens/myoPizza/MyoPizza';
+import OrderScreen from './Screens/OrderScreen/OrderScreen';
+import Orderslist from './Screens/Orderslist.js';
+import PasswordReset from './Screens/PasswordReset';
+import Pizzaslist from './Screens/Pizzaslist.js';
+import Signup from './Screens/Signup';
+import Toppingslist from './Screens/Toppingslist.js';
+import Userslist from './Screens/Userslist.js';
+
+function App() {
+	const [isAdmin, setIsAdmin] = useState(false);
+
+	const userstate = useSelector((state) => state.setUserData);
+	const user = userstate.userData;
+
+	const dispatch = useDispatch();
+	useEffect(() => {
+		let token = localStorage.getItem('token');
+		if (token) {
+			const url =
+				'https://pizza-app-backend12.herokuapp.com/api/auth/jwt/verify';
+			axios
+				.get(url, {
+					params: {
+						token,
+					},
+				})
+				.then((res) => {
+					if (res.data.success) {
+						if (res?.data?.data?.role === 'admin') {
+							setIsAdmin(true);
+						}
+						if (res?.data?.userData) {
+							dispatch(setUserData(res.data.userData));
+						}
+					}
+				})
+				.catch((err) => {
+					console.log(err);
+				});
+		}
+	}, [dispatch]);
+
+	return (
+		<Routes>
+			<Route path='/signup' element={<Signup />} />
+			<Route path='/login' element={<Login />} />
+			<Route path='/users/:id/verify/:token' element={<EmailVerify />} />
+			<Route path='/forgot-password' element={<ForgotPassword />} />
+			<Route
+				path='/password-reset/:id/:token'
+				element={<PasswordReset />}
+			/>
+
+			{user?.role && (
+				<>
+					<Route path='/home' element={<Home />} />
+					<Route path='/cart' element={<CartScreen />} />
+					<Route path='/myoPizza' element={<MyoPizza />} />
+					<Route path='/myorders' element={<OrderScreen />} />
+				</>
+			)}
+
+			{isAdmin && (
+				<>
+					<Route path='/admin' element={<AdminScreen />} />
+					<Route path='/admin/addpizzas' element={<Addpizza />} />
+					<Route path='/admin/userslist' element={<Userslist />} />
+					<Route path='/admin/orderslist' element={<Orderslist />} />
+					<Route path='/admin/pizzaslist' element={<Pizzaslist />} />
+					<Route
+						path='/admin/editpizza/:pizzaid'
+						element={<Editpizza />}
+					/>
+					<Route path='/admin/baseslist' element={<Baseslist />} />
+					<Route path='/admin/addbases' element={<Addbases />} />
+					<Route
+						path='/admin/editbase/:baseid'
+						element={<Editbase />}
+					/>
+					<Route
+						path='/admin/toppingslist'
+						element={<Toppingslist />}
+					/>
+					<Route path='/admin/addtopping' element={<Addtopping />} />
+					<Route
+						path='/admin/edittopping/:toppingid'
+						element={<Edittopping />}
+					/>
+				</>
+			)}
+			<Route path='*' element={<Main />} />
+		</Routes>
+	);
+}
+
+export default App
+# OIBSIP_Pizza-delivery-app
+
+This is a Full stack Pizza Delivery Web App .
+
+## Features : -
+
+1. For User :-
+
+-   User login and Admin login with complete registration , authorization ,email verification and forgot password system.
+-   User can add already present pizza items to the cart or can customize his/her own pizza and add it to cart.
+-   Razorpay integration for payment.
+-   All orders made by user are displayed in "My Orders".
+-   User can see order status as delivered or not delivered.
+
+2. For Admin :-
+
+-   Admin can see present users list , pizzas list ,orders list ,bases list and toppings list.
+-   Edit or delete the pizzas present .
+-   Edit or delete the pizza bases and toppings present.
+-   Add new pizzas , pizza bases and toppings.
+-   Admin can change order status as delivered from his side which will get reflected to User.
+
+## Tech Stack :-
+
+Mongo DB , React js , Express js , Node js, Redux, Axios , Chakra UI , Ant Design
+
+## Give it a try and have fun-
+
+https://pizza-delivery-app-e1273.web.app/
+
+## Demo :-
+
+https://user-images.githubusercontent
+{
+  "short_name": "React App",
+  "name": "Create React App Sample",
+  "icons": [
+    {
+      "src": "favicon.ico",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "logo192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "logo512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#000000",
+  "background_color": "#ffffff"
+}
+# https://www.robotstxt.org/robotstxt.html
+User-agent: *
+Disallow:export const getAllUsersReducer = (state = { users: [] }, action) => {
+	switch (action.type) {
+		case 'GET_ALL_USERS_REQUEST':
+			return {
+				loading: true,
+				...state,
+			};
+		case 'GET_ALL_USERS_SUCCESS':
+			return {
+				loading: false,
+				users: action.payload,
+			};
+		case 'GET_ALL_USERS_FAILED':
+			return {
+				loading: false,
+				error: action.payload,
+			};
+		default:
+			return state;
+	}
+};
+
+// setUserData from actions/userAction.js
+export const setUserDataReducer = (state = { userData: [] }, action) => {
+	switch (action.type) {
+		case 'SET_USER_DATA':
+			return {
+				userData: action.payload,
+			};
+		default:
+			return state;
+	}
+};
+export const cartReducer = (state = { cartItems: [] }, action) => {
+	switch (action.type) {
+		case 'ADD_TO_CART':
+			const alreadyExists = state.cartItems.find(
+				(item) => item._id === action.payload._id,
+			);
+			if (alreadyExists) {
+				return {
+					...state,
+					cartItems: state.cartItems.map((item) =>
+						item._id === action.payload._id ? action.payload : item,
+					),
+				};
+			} else {
+				return {
+					...state,
+					cartItems: [...state.cartItems, action.payload],
+				};
+			}
+
+		case 'DELETE_FROM_CART':
+			return {
+				...state,
+				cartItems: state.cartItems.filter(
+					(item) => item._id !== action.payload._id,
+				),
+			};
+
+		default:
+			return state;
+	}
+};
+export const getAllBasesReducer = (state = { bases: [] }, action) => {
+	switch (action.type) {
+		case 'GET_BASES_SUCCESS':
+			return {
+				loading: false,
+				bases: action.payload,
+			};
+
+		default:
+			return state;
+	}
+};
+export const getAllSaucesReducer = (state = { sauces: [] }, action) => {
+	switch (action.type) {
+		case 'GET_SAUCES_SUCCESS':
+			return {
+				loading: false,
+				sauces: action.payload,
+			};
+
+		default:
+			return state;
+	}
+};
+export const getAllToppingsReducer = (state = { toppings: [] }, action) => {
+	switch (action.type) {
+		case 'GET_TOPPINGS_SUCCESS':
+			return {
+				loading: false,
+				toppings: action.payload,
+			};
+
+		default:
+			return state;
+	}
+};
+export const getAllCheeseReducer = (state = { cheese: [] }, action) => {
+	switch (action.type) {
+		case 'GET_CHEESE_SUCCESS':
+			return {
+				loading: false,
+				cheese: action.payload,
+			};
+
+		default:
+			return state;
+	}
+};
+
+//add base
+export const addBaseReducer = (state = {}, action) => {
+	switch (action.type) {
+		case 'ADD_BASE_REQUEST':
+			return {
+				loading: true,
+				...state,
+			};
+		case 'ADD_BASE_SUCCESS':
+			return {
+				loading: false,
+				success: true,
+			};
+		case 'ADD_BASE_FAILED':
+			return {
+				loading: false,
+				error: action.payload,
+			};
+		default:
+			return state;
+	}
+};
+
+export const getBaseByIdReducer = (state = {}, action) => {
+	switch (action.type) {
+		case 'GET_BASE_BY_ID_REQUEST':
+			return {
+				loading: true,
+				...state,
+			};
+		case 'GET_BASE_BY_ID_SUCCESS':
+			return {
+				loading: false,
+				base: action.payload,
+			};
+		case 'GET_BASE_BY_ID_FAILED':
+			return {
+				loading: false,
+				error: action.payload,
+			};
+		default:
+			return state;
+	}
+};
+export const updateBaseReducer = (state = {}, action) => {
+	switch (action.type) {
+		case 'UPDATE_BASE_REQUEST':
+			return {
+				updateloading: true,
+				...state,
+			};
+		case 'UPDATE_BASE_SUCCESS':
+			return {
+				updateloading: false,
+				updatesuccess: true,
+			};
+		case 'UPDATE_BASE_FAILED':
+			return {
+				updateloading: false,
+				updateerror: action.payload,
+			};
+		default:
+			return state;
+	}
+};
+
+//add topping
+export const addToppingReducer = (state = {}, action) => {
+	switch (action.type) {
+		case 'ADD_TOPPING_REQUEST':
+			return {
+				loading: true,
+				...state,
+			};
+		case 'ADD_TOPPING_SUCCESS':
+			return {
+				loading: false,
+				success: true,
+			};
+		case 'ADD_TOPPING_FAILED':
+			return {
+				loading: false,
+				error: action.payload,
+			};
+		default:
+			return state;
+	}
+};
+
+//get topping by id reducer
+export const getToppingByIdReducer = (state = {}, action) => {
+	switch (action.type) {
+		case 'GET_TOPPING_BY_ID_REQUEST':
+			return {
+				loading: true,
+				...state,
+			};
+		case 'GET_TOPPING_BY_ID_SUCCESS':
+			return {
+				loading: false,
+				topping: action.payload,
+			};
+		case 'GET_TOPPING_BY_ID_FAILED':
+			return {
+				loading: false,
+				error: action.payload,
+			};
+		default:
+			return state;
+	}
+};
+
+//update topping reducer
+export const updateToppingReducer = (state = {}, action) => {
+	switch (action.type) {
+		case 'UPDATE_TOPPING_REQUEST':
+			return {
+				updateloading: true,
+				...state,
+			};
+		case 'UPDATE_TOPPING_SUCCESS':
+			return {
+				updateloading: false,
+				updatesuccess: true,
+			};
+		case 'UPDATE_TOPPING_FAILED':
+			return {
+				updateloading: false,
+				updateerror: action.payload,
+			};
+		default:
+			return state;
+	}
+};
+export const placeOrderReducer = (state = {}, action) => {
+	switch (action.type) {
+		case 'PLACE_ORDER_REQUEST':
+			return {
+				loading: true,
+			};
+		case 'ORDER_CREATED_SUCCESS':
+			return {
+				loading: true,
+				success: false,
+			};
+		case 'PLACE_ORDER_LOADING':
+			return {
+				loading: true,
+				success: false,
+			};
+		case 'ORDER_VERIFY_SUCCESS':
+			return {
+				loading: false,
+				success: true,
+			};
+		case 'PLACE_ORDER_FAILED':
+			return {
+				loading: false,
+				error: action.payload,
+			};
+		default:
+			return state;
+	}
+};
+
+export const getUserOrdersReducer = (state = { orders: [] }, action) => {
+	switch (action.type) {
+		case 'GET_USER_ORDERS_REQUEST':
+			return {
+				loading: true,
+				...state,
+			};
+		case 'GET_USER_ORDERS_SUCCESS':
+			return {
+				loading: false,
+				orders: action.payload,
+			};
+		case 'GET_USER_ORDERS_FAILED':
+			return {
+				loading: false,
+				error: action.payload,
+			};
+		default:
+			return state;
+	}
+};
+
+export const getAllOrdersReducer = (state = { orders: [] }, action) => {
+	switch (action.type) {
+		case 'GET_ALL_ORDERS_REQUEST':
+			return {
+				loading: true,
+				...state,
+			};
+		case 'GET_ALL_ORDERS_SUCCESS':
+			return {
+				loading: false,
+				orders: action.payload,
+			};
+		case 'GET_ALL_ORDERS_FAILED':
+			return {
+				loading: false,
+				error: action.payload,
+			};
+		default:
+			return state;
+	}
+};
+
+//deliver order reducer
+export const deliverOrderReducer = (state = { orders: [] }, action) => {
+	switch (action.type) {
+		case 'DELIVER_ORDER_REQUEST':
+			return {
+				loading: true,
+			};
+		case 'DELIVER_ORDER_SUCCESS':
+			return {
+				loading: false,
+				orders: action.payload,
+			};
+		case 'DELIVER_ORDER_FAILED':
+			return {
+				loading: false,
+				error: action.payload,
+			};
+		default:
+			return state;
+	}
+};
+export const getAllPizzasReducer = (state = { pizzas: [] }, action) => {
+	switch (action.type) {
+		case 'GET_PIZZAS_REQUEST':
+			return {
+				loading: true,
+				...state,
+			};
+		case 'GET_PIZZAS_SUCCESS':
+			return {
+				loading: false,
+				pizzas: action.payload,
+			};
+		case 'GET_PIZZAS_FAILED':
+			return {
+				loading: false,
+				error: action.payload,
+			};
+		default:
+			return state;
+	}
+};
+
+export const addPizzaReducer = (state = {}, action) => {
+	switch (action.type) {
+		case 'ADD_PIZZA_REQUEST':
+			return {
+				loading: true,
+				...state,
+			};
+		case 'ADD_PIZZA_SUCCESS':
+			return {
+				loading: false,
+				success: true,
+			};
+		case 'ADD_PIZZA_FAILED':
+			return {
+				loading: false,
+				error: action.payload,
+			};
+		default:
+			return state;
+	}
+};
+
+//get pizza by id reducer
+export const getPizzaByIdReducer = (state = {}, action) => {
+	switch (action.type) {
+		case 'GET_PIZZA_BY_ID_REQUEST':
+			return {
+				loading: true,
+				...state,
+			};
+		case 'GET_PIZZA_BY_ID_SUCCESS':
+			return {
+				loading: false,
+				pizza: action.payload,
+			};
+		case 'GET_PIZZA_BY_ID_FAILED':
+			return {
+				loading: false,
+				error: action.payload,
+			};
+		default:
+			return state;
+	}
+};
+//update pizza reducer
+export const updatePizzaReducer = (state = {}, action) => {
+	switch (action.type) {
+		case 'UPDATE_PIZZA_REQUEST':
+			return {
+				updateloading: true,
+				...state,
+			};
+		case 'UPDATE_PIZZA_SUCCESS':
+			return {
+				updateloading: false,
+				updatesuccess: true,
+			};
+		case 'UPDATE_PIZZA_FAILED':
+			return {
+				updateloading: false,
+				updateerror: action.payload,
+			};
+		default:
+			return state;
+	}
+};
